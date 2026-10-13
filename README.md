@@ -10,7 +10,7 @@
 
 ## 本 fork 的新增内容
 
-本仓库是 [csyangwen/dsh-memory-evolve](https://github.com/csyangwen/dsh-memory-evolve) 的 GitHub fork，保留上游 `dsh-memory-evolve` 包身份和最新修复，并合入 [Archer76/dsh-memory-evolve-suite](https://github.com/Archer76/dsh-memory-evolve-suite) 的三份记忆运维技能、14 个辅助脚本及两组回归测试。保留上游 `memory-consolidate`，内置技能共 8 份。来源、合并取舍、脚本用法及兼容性范围见 [合并说明](docs/suite-integration.md)。
+本仓库是 [csyangwen/dsh-memory-evolve](https://github.com/csyangwen/dsh-memory-evolve) 的 GitHub fork，合入 [Archer76/dsh-memory-evolve-suite](https://github.com/Archer76/dsh-memory-evolve-suite) 的三份记忆运维技能、14 个辅助脚本及回归测试。**重复功能以 suite 的技能与流程为准**：不再分发上游重复的整理技能；仅将上游独有的只读候选扫描接入 `dsh-memory-curation`，辅助脚本合计 15 个，内置技能共 7 份。保留上游包身份及必要的兼容性、数据完整性修复。来源、合并取舍、脚本用法及验证范围见 [合并说明](docs/suite-integration.md)。
 
 ## 快速开始（安装）
 

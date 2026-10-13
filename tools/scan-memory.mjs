@@ -1,14 +1,15 @@
 #!/usr/bin/env node
 /**
- * memory-consolidate 预扫脚本 — dsh-memory-evolve 内置技能 memory-consolidate 的辅助工具。
+ * 记忆候选预扫工具 — 供 suite 的 dsh-memory-curation / dsh-memory-compression 使用。
+ * 来源：csyangwen/dsh-memory-evolve e6f6b84 的 scan_memory.mjs（MIT）。
  *
  * 零依赖、只读扫描记忆目录，产出「候选簇」JSON 报告（字面重复 / 相近条目 /
  * 覆盖更新线索 / 冲突线索），供 AI 会话按技能内批准的合并标准逐簇裁决。
  * 脚本只做候选发现，不做任何写操作、不做最终裁决——是否合并、怎么合并、
- * 保留哪条，一律由 AI 按标准判定后用 memory 工具（replace/archive/add）执行。
+ * 保留哪条及如何写入，一律沿用 suite 技能的快照、校验和归档流程。
  *
  * 用法：
- *   node scan_memory.mjs [--dir ~/.dsh/memories] [--out report.json] [--threshold 0.42]
+ *   node scan-memory.mjs [--dir ~/.dsh/memories] [--out report.json] [--threshold 0.42]
  *
  * 扫描范围（与技能的执行边界一致）：
  *   全局  MEMORY.md / USER.md（合并对象）+ *-archive.md（仅作上下文，不进簇）
@@ -25,7 +26,7 @@ import { pathToFileURL } from 'node:url'
 /** 记忆条目分隔符，与 lib/store.js 的 ENTRY_DELIMITER 字节兼容。 */
 export const ENTRY_DELIMITER = '\n§\n'
 
-const USAGE = `usage: node scan_memory.mjs [--dir <memoryDir>] [--out <report.json>] [--threshold <0..1>]
+const USAGE = `usage: node scan-memory.mjs [--dir <memoryDir>] [--out <report.json>] [--threshold <0..1>]
   --dir        memory directory (default: ~/.dsh/memories)
   --out        write JSON report to file (default: stdout)
   --threshold  cosine similarity floor for "similar" candidates (default: 0.42)`
@@ -321,13 +322,13 @@ export function main(argv = []) {
   try {
     opts = parseArgs(argv)
   } catch (err) {
-    console.error(`[memory-consolidate] ${err.message}`)
+    console.error(`[memory-scan] ${err.message}`)
     console.error(USAGE)
     return 2
   }
   const dir = opts.dir ? expandHome(opts.dir) : join(homedir(), '.dsh', 'memories')
   if (!existsSync(dir)) {
-    console.error(`[memory-consolidate] dir not found: ${dir}`)
+    console.error(`[memory-scan] dir not found: ${dir}`)
     return 3
   }
   const scanned = scanDir(dir)
@@ -350,7 +351,7 @@ export function main(argv = []) {
   const json = JSON.stringify(report, null, 2)
   if (opts.out) {
     writeFileSync(opts.out, json + '\n', 'utf8')
-    console.log('[memory-consolidate] scan complete')
+    console.log('[memory-scan] scan complete')
     console.log(`  dir: ${dir}`)
     console.log(`  live entries: ${scanned.entries.length} (archived context: ${scanned.archivedEntries.length})`)
     console.log(`  candidate clusters: ${clusters.length}`)

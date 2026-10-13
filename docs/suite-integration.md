@@ -1,6 +1,6 @@
 # Suite integration / Suite 合并说明
 
-This fork retains the upstream `dsh-memory-evolve` package identity and integrates the additions from `Archer76/dsh-memory-evolve-suite` without reverting newer upstream fixes. 本 fork 保留上游包身份，移入 suite 增量，同时保留上游的新修复。
+**重复功能以 Archer76/dsh-memory-evolve-suite 的技能与流程为准；仅接入 suite 没有的上游能力。** Overlapping features use the suite implementation and workflows. Unique upstream capabilities and necessary compatibility/data-integrity fixes are retained.
 
 ## Sources and history / 来源与历史
 
@@ -8,81 +8,69 @@ This fork retains the upstream `dsh-memory-evolve` package identity and integrat
 - Suite: [Archer76/dsh-memory-evolve-suite](https://github.com/Archer76/dsh-memory-evolve-suite), commit `1746629e9e6aae383c391ded45b7124404e4230e` (0.3.2).
 - Fork: [Archer76/dsh-memory-evolve](https://github.com/Archer76/dsh-memory-evolve).
 
-The two source repositories have independent Git roots. The integration commit retains both histories: the upstream tree is the base, and selected suite additions are applied before completing the merge. 这不是将 suite 整目录覆盖到上游；双父合并保留两个仓库历史，对同名实现逐项比较后采用较新的上游实现。
+The first integration commit `0c1f8d5` retains both independent Git histories. This follow-up applies the owner's suite-first deduplication policy without rewriting that history. 上游更新日志保留为来源历史，其中记载的技能不代表本 fork 当前仍分发该技能。
 
-The upstream MIT license is retained. Suite's original license is the same MIT text with the same copyright notice. The source links and exact suite commit above identify the imported work.
+The original MIT license and copyright notice are retained. The source links and commits above identify the imported work.
 
-## Imported additions / 迁入内容
+## Feature decisions / 功能取舍
 
 | Content | Decision |
 |---|---|
-| `dsh-memory-compression` | Imported: large-track compression, snapshots, verification and staging. 提供大轨压缩流程。 |
-| `dsh-memory-curation` | Imported: routine cleanup and archival. 提供日常整理及归档流程。 |
-| `dsh-injection-track-triage` | Imported: historical prompt interpolation diagnosis and session inspection. 提供插值故障取证流程。 |
-| `tools/` | Imported unchanged: 14 JavaScript CLI scripts, CommonJS package metadata and the edits example. |
-| Bundled-skill and tool tests | Imported and adapted for eight skills, upstream CRLF handling and isolated source fixtures. |
-| `.gitattributes` | Skill documents retain LF in distributed checkouts. |
-| Fork metadata and installation docs | `repository` and quick-start commands point to this fork. The plugin id remains `dsh-memory-evolve`. |
+| Routine curation / 日常整理 | Use suite's `dsh-memory-curation`: snapshots, curation scripts, archival and rendering checks. |
+| Large-track compression / 大轨压缩 | Use suite's `dsh-memory-compression`: chunking, token/fact checks, staging and concurrent-addition preservation. |
+| Injection diagnosis / 注入排障 | Use suite's `dsh-injection-track-triage`. |
+| Upstream `memory-consolidate` skill | Removed from both the package and built-in registry; its overlapping workflow is not injected. |
+| Unique candidate scanner / 独有候选预扫 | Extracted into `tools/scan-memory.mjs` and invoked from suite's curation skill. No second curation skill entry. |
+| Original suite tools | All 14 JavaScript scripts retained; with the upstream scanner there are 15 helper scripts. |
+| Compatibility and integrity fixes | Retain upstream fixes to the existing single plugin implementation, without introducing duplicate functional entry points. |
 
-Upstream's four CLI skills and `memory-consolidate` remain, for a total of **eight built-in skills**. New skill provider fields use `dsh-memory-evolve`; their `x-version` is 2 so an existing version-1 copy can receive the fork-specific updates. Users who customized these skills should back up their copies before enabling the usual version-gated synchronization.
+The seven built-in skills are `kimi-cli-calling`, `codex-cli-calling`, `grok-cli-calling`, `hermes-cli-calling`, `dsh-memory-compression`, `dsh-memory-curation`, and `dsh-injection-track-triage`.
 
-The imported skills explain that upstream now sanitizes double opening braces in memory snapshots. Their historical diagnosis steps still apply to older versions or unsanitized paths; raw-file checks do not establish failure in the current final model input. The PowerShell recursive-search example was corrected.
+The suite curation skill advances to `x-version: 3` to synchronize the scanner integration instructions. The compression and diagnosis skills remain at fork version 2. All provider fields use the fork's `dsh-memory-evolve` package identity.
 
-## Preserved upstream fixes / 保留的上游修复
+## Candidate scanner / 候选扫描
 
-Suite's four `source.kind` changes are already covered by upstream `f48ab4d`, which centralizes the producer-owned source kind and has regression tests. The older suite versions of these files are not copied over.
+```sh
+node <package-tools>/scan-memory.mjs --dir <memoryDir> --out <workspace>/memory-scan-report.json --threshold 0.42
+```
 
-The integration also retains upstream's:
+The scanner retains upstream's TF-IDF similarity, quoted-reference/supersede clues, conflict-polarity hints and candidate clustering. It reads global/user/project tracks; daily logs and todos are excluded, and archives only provide context. It does not modify memory files. `--out` writes the JSON report; without `--out` it prints the report to stdout.
 
-- DSH icon and session-navigation compatibility changes (`e6f6b84`).
-- Settings describe/read and commit-event compatibility (`db83f84`).
+候选簇只是检索辅助，不是自动合并裁决。核对原文、日期、保护项和所属项目后，沿用 suite 的快照、整理、压缩、归档与校验流程。上游重复的工具专用写入流程没有移入本 fork。
+
+Source: upstream `skills/memory-consolidate/scripts/scan_memory.mjs` at `e6f6b84`. The algorithm is retained; the path, usage/log labels and workflow comments are adapted to the suite toolset.
+
+## Preserved fixes / 保留修复
+
+- Producer-owned message source kind, replacing rejected legacy injection messages.
+- DSH icon/session navigation and settings describe/event compatibility.
 - `Session.ownEvents()` support, snapshot sanitization and literal-variable handling.
 - Display-form memory matching, archive fixes and final-response ordering.
-- UTF-8 streaming decode and Git subprocess timeout cleanup.
-- Skill synchronization independent of the COI toggle, whole-directory copy, default-directory handling and CRLF version parsing.
+- UTF-8 streaming decode and Git subprocess timeout settlement/cleanup.
+- Skill synchronization independent of COI, whole-directory copy, default-directory handling and CRLF version parsing.
 
-The client bundle is the upstream artifact, unchanged by this integration. New skills and tools do not require a client rebuild. The package version stays at upstream 0.1.0; this integration does not publish a release or import suite release tags into the fork remote.
+The client artifact stays unchanged. The package version remains upstream 0.1.0; these changes create no release or release tags. Raw-file prompt checks in the suite skills still apply to older or unsanitized paths, but do not establish failure in a current sanitized model input.
 
-## Tool usage / 脚本用法
-
-Use the package's `tools` directory directly; every script gives usage when called without arguments. Scripts operate on explicitly supplied track files or temporary staging paths. Review the skill workflows and backup requirements before running write operations on real memory.
-
-| Scripts | Purpose |
-|---|---|
-| `track-index.js`, `track-summaries.js` | Track inventory and summaries / 条目索引与摘要 |
-| `check-summaries.js`, `check-inject.js` | Summary format and raw prompt rendering checks / 摘要与原始注入检查 |
-| `verify-merge.js`, `verify-hard.js` | Coverage/token checks and hard-fact checks / 覆盖与事实校验 |
-| `assemble.js`, `assemble-and-swap.js` | Staging and explicit write/archive operations / 装配、落盘及归档 |
-| `unexpire.js`, `curate.js` | Outdated-fact replacement and routine curation / 过期更正与整理 |
-| `ztail.js`, `zscan.js`, `zdump.js`, `msgsrc.js` | Session-frame inspection and message-source inspection / 会话取证 |
-
-`check-inject.js` may need `DSH_SYSTEM_PROMPT_MODULE` to locate a compatible installed renderer. Zstd tools require a Node runtime exposing the corresponding zlib API. Session file names and generations must match the actual DSH installation.
-
-## Install / 安装
+## Install and upgrade / 安装与升级
 
 ```sh
 git clone https://github.com/Archer76/dsh-memory-evolve.git
-# Use the absolute path to that clone:
 dsh plugin --profile web add <absolute-clone-path>
 ```
 
-Keeping the clone's `.git` directory allows the existing updater to inspect its `origin`. Marketplace or Git-dependency installs may strip Git history. This integration creates no release tags, so a merged commit is not a new tagged updater release.
+The plugin id remains `dsh-memory-evolve`; use the fork as the upstream replacement in a profile. Keeping `.git` enables the existing updater to inspect `origin`; Git-dependency/marketplace installs may strip history. No new updater release tag is created here.
 
-This fork uses the same plugin id, tool names and storage conventions as upstream. Install it as the upstream replacement in a profile, not as a second copy of the original plugin in that same profile. This integration does not migrate existing memories or install the fork into a running profile.
+If a previous eight-skill version was installed, the skill synchronizer does not delete existing user-library folders when a skill leaves the package. Disable the old `memory-consolidate` copy in the skill manager to prevent duplicate instructions; user-edited skill files are not automatically removed. 本次只调整仓库，没有安装或修改运行中的 profile 或真实用户技能库。
 
-## Validation and compatibility / 验证与兼容性
-
-Run the imported and upstream skill regressions:
+## Validation / 验证
 
 ```sh
-node --test tests/bundled-skills.test.js tests/tools.test.js tests/skills-sync-default-dir.test.js tests/skills-sync-decoupled.test.js tests/skill-memory-consolidate.test.js tests/injection-source-kind.test.js
-node --test --test-name-pattern="skills sync|issue #58|DSH 0.2.0" tests/coi.test.js tests/plugin.test.js
+node --test tests/bundled-skills.test.js tests/tools.test.js tests/skills-sync-default-dir.test.js tests/skills-sync-decoupled.test.js tests/memory-scan.test.js tests/injection-source-kind.test.js
+node --test --test-name-pattern="skills sync|issue #58|locale watcher" tests/coi.test.js tests/plugin.test.js
 ```
 
-The package test glob no longer uses shell single quotes, which previously produced a zero-test success on Windows. Set a temporary test home when running assembly tests so automatic skill synchronization cannot write to a real user skill library.
+The regressions check the seven-entry registry against the actual package directories, default assembly, version protection, retained suite tools, scanner candidate logic, and the real relocated scanner CLI's read-only behavior. Use a temporary test home so assembly tests cannot synchronize skills into a real user library. The Windows test glob remains fixed.
 
-Validation on Windows with bundled Node v24.21.0: the six-file skill/tool/source-kind suite passed **42/42**, the focused sync/assembly suite passed **4/4**, and the retained settings-event regression passed **1/1**. The additional Windows `cmd` glob smoke executed the named `BUILTIN_SKILLS` test successfully; its 74 reported successes include empty filtered-file entries and are not counted as 74 behavior tests. All 16 imported tool-directory files (14 scripts plus metadata/example) were byte-identical to suite. `git diff --check` passed, and the upstream client bundle and inspected compatibility fixes were unchanged.
+Windows / Node v24.21.0 validation: **43/43** skill/tool/scanner/source-kind regressions and **5/5** focused sync/assembly/settings regressions passed (**48 total**). The package directories match the seven-entry registry, the real relocated scanner CLI produces a report without changing memory text, and real default assembly excludes the redundant upstream skill. All 16 original suite tool-directory files retain their content; only Windows/Git CRLF normalization differs from the source repository. The inspected client artifact and compatibility/integrity implementations are unchanged. `git diff --check` passed.
 
-Windows 验证：47 项针对性回归全部通过，另验证默认命令 shell 能通过修正后的 glob 实际运行技能清单测试；测试主目录隔离在工作区中，没有修改真实用户技能库。没有运行全套测试或在现有 DSH profile 安装插件。
-
-This merge does not certify complete DSH v0.2.1-alpha.2 compatibility: upstream compatibility changes are preserved, but full Loader/browser/model end-to-end verification and the earlier lifecycle/Windows canvas findings are outside this integration's implementation scope.
+没有运行全套测试，也没有修改真实用户技能库或运行中的 profile。Full Loader/browser/model end-to-end compatibility with DSH v0.2.1-alpha.2 is not established; the previously identified lifecycle and Windows canvas issues remain outside this deduplication change.

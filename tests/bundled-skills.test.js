@@ -9,7 +9,7 @@
  */
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { cpSync, existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { cpSync, existsSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -25,7 +25,8 @@ function tempUserSkills() {
 }
 
 test('BUILTIN_SKILLS 与包内 skills/ 目录一一对应', () => {
-  assert.ok(BUILTIN_SKILLS.length >= 8, `内置技能不应少于 8 个，实际 ${BUILTIN_SKILLS.length}`)
+  assert.equal(BUILTIN_SKILLS.length, 7, `内置技能应为 7 个，实际 ${BUILTIN_SKILLS.length}`)
+  assert.deepEqual(readdirSync(PLUGIN_SKILLS).sort(), [...BUILTIN_SKILLS].sort(), '包内技能目录应与注册清单一致')
   for (const name of BUILTIN_SKILLS) {
     assert.ok(isSkillName(name), `${name} 不是合法 kebab-case 技能名`)
     assert.ok(existsSync(join(PLUGIN_SKILLS, name, 'SKILL.md')), `包内缺少 skills/${name}/SKILL.md`)

@@ -3,13 +3,35 @@ import assert from 'node:assert/strict'
 import { existsSync, mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
+import { spawnSync } from 'node:child_process'
+import { fileURLToPath } from 'node:url'
 import {
   ENTRY_DELIMITER, clusterEntries, computeIdf, cosine, diceBigrams, entryTerms,
   fnv1a32, main, normText, pairReasons, parseArgs, parseMemoryText, quotedRefersTo, scanDir, stripHeaderComment,
-} from '../skills/memory-consolidate/scripts/scan_memory.mjs'
+} from '../tools/scan-memory.mjs'
 
-// memory-consolidate 内置技能的预扫脚本：解析 / 相似度 / 候选理由 / 聚类 /
-// 目录扫描 / CLI。脚本只做候选发现，写操作由 AI 用 memory 工具执行（不在本文件范围）。
+// suite 共享预扫工具：解析 / 相似度 / 候选理由 / 聚类 /
+// 目录扫描 / CLI。脚本只做候选发现，整理写入沿用 suite 技能流程。
+
+test('迁移后的 tools CLI：产出候选报告且不修改记忆原文', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'memscan-tool-'))
+  const memoryFile = join(dir, 'MEMORY.md')
+  const reportFile = join(dir, 'report.json')
+  const original = '[2026-09-01] 相同记忆用于独立扫描测试\n§\n[2026-09-02] 相同记忆用于独立扫描测试\n'
+  try {
+    writeFileSync(memoryFile, original)
+    const cli = fileURLToPath(new URL('../tools/scan-memory.mjs', import.meta.url))
+    const result = spawnSync(process.execPath, [cli, '--dir', dir, '--out', reportFile], { encoding: 'utf8' })
+    assert.equal(result.status, 0, `${result.stdout}\n${result.stderr}`)
+    const report = JSON.parse(readFileSync(reportFile, 'utf8'))
+    assert.equal(report.stats.entries, 2)
+    assert.equal(report.stats.clusters, 1)
+    assert.equal(report.clusters[0].hint, 'duplicate')
+    assert.equal(readFileSync(memoryFile, 'utf8'), original, '只读预扫不能改写记忆')
+  } finally {
+    rmSync(dir, { recursive: true, force: true })
+  }
+})
 
 const entriesOf = (texts, meta = {}) =>
   texts.map((t) => parseMemoryText(t, meta)).flat()

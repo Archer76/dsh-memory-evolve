@@ -10,7 +10,7 @@
 
 ## Additions in this fork
 
-This is a GitHub fork of [csyangwen/dsh-memory-evolve](https://github.com/csyangwen/dsh-memory-evolve). It retains the upstream package identity and latest fixes while integrating three memory operations skills, 14 helper scripts, and two regression test suites from [Archer76/dsh-memory-evolve-suite](https://github.com/Archer76/dsh-memory-evolve-suite). The upstream `memory-consolidate` skill is retained, bringing the built-in total to eight. See the [integration notes](docs/suite-integration.md) for sources, merge decisions, tool usage, and compatibility limits.
+This is a GitHub fork of [csyangwen/dsh-memory-evolve](https://github.com/csyangwen/dsh-memory-evolve), integrating three memory operations skills, 14 helper scripts, and regression tests from [Archer76/dsh-memory-evolve-suite](https://github.com/Archer76/dsh-memory-evolve-suite). **Suite skills and workflows take precedence for overlapping functions.** The redundant upstream curation skill is not shipped; only its unique read-only candidate scanner is integrated into `dsh-memory-curation`. There are seven built-in skills and 15 helper scripts. The upstream package identity and compatibility/data-integrity fixes are retained. See the [integration notes](docs/suite-integration.md) for sources, decisions, usage, and validation.
 
 ## Quick Start (Installation)
 

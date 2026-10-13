@@ -1229,10 +1229,11 @@ test('issue #58：coiEnabled=false 时 apply() 仍然同步内置技能', () => 
     apply(ctx, { memoryDir: dir, skillDir: skills, coiEnabled: false })
     const installed = installedSkills(skills)
     assert.ok(
-      installed.includes('memory-consolidate'),
+      installed.includes('dsh-memory-curation'),
       `coiEnabled=false 也必须同步内置技能（旧实现下一个都不会有），实际：${JSON.stringify(installed)}`,
     )
-    assert.equal(installed.length, 8, '八个内置技能都应落盘')
+    assert.equal(installed.length, 7, '七个内置技能都应落盘')
+    assert.ok(!installed.includes('memory-consolidate'), '不应安装重复的上游整理技能')
   } finally {
     clean(dir)
   }

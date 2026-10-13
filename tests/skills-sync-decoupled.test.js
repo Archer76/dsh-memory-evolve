@@ -3,7 +3,7 @@
  *
  * 缺陷：`syncBuiltinSkills()` 的调用点曾在 `installCoi()` 内，而 `installCoi`
  * 由 `coiEnabled` 门控（默认 `false`——本插件本职是记忆/待办/技能，调度是按需
- * 增强）。于是**默认配置下内置技能永远不会进技能库**：`memory-consolidate` 与
+ * 增强）。于是**默认配置下内置技能永远不会进技能库**：`dsh-memory-curation` 与
  * kimi/codex/grok/hermes 四个 CLI 使用指南在 `~/.agents/skills` 与会话技能列表
  * 里都不出现，且因为调用点包着 try/catch 只打一行 warn，连痕迹都留不下。
  * 与 §7.5 broadcast 当初"独立子模块挂在 COI 下拆不开"是同款事故。
@@ -53,7 +53,7 @@ function captureConsole(fn) {
   return { logs, warns }
 }
 
-test('源头在包内：PLUGIN_SKILLS_DIR 指向仓库的 skills/，五个内置技能齐全', () => {
+test('源头在包内：PLUGIN_SKILLS_DIR 指向仓库的 skills/，所有内置技能齐全', () => {
   assert.ok(PLUGIN_SKILLS_DIR.startsWith(PACKAGE_ROOT), `源头必须在包内：${PLUGIN_SKILLS_DIR}`)
   assert.equal(PLUGIN_SKILLS_DIR.replaceAll('\\', '/').endsWith('/skills/'), true, '必须指向 skills/ 目录')
   for (const name of BUILTIN_SKILLS) {
@@ -95,7 +95,7 @@ test('coiSyncSkills=false 是唯一的关断开关（coiEnabled=true 也照样�
 })
 
 test('skillDir 为 null 哨兵时落到 DEFAULT_SKILL_DIR（用空源头避免写入真实技能库）', () => {
-  // 用**空的内置技能源头**：五个技能全部 action:'missing' → 一次 cpSync 都不会
+  // 用**空的内置技能源头**：所有技能全部 action:'missing' → 一次 cpSync 都不会
   // 发生，因此即使解析到真实的 ~/.agents/skills 也不会写入任何东西。目标目录
   // 由日志行断言。
   const pluginSkills = tempDir()
@@ -106,7 +106,7 @@ test('skillDir 为 null 哨兵时落到 DEFAULT_SKILL_DIR（用空源头避免�
     ))
     assert.equal(logs.length, 1, '每次同步都要落一行可见日志（issue #67）')
     assert.ok(logs[0].includes(DEFAULT_SKILL_DIR), `日志必须写明目标目录（DEFAULT_SKILL_DIR）：${logs[0]}`)
-    assert.equal(warns.length, 1, '五个源头全缺 → 必须 warn 一次（打包事故不能静默）')
+    assert.equal(warns.length, 1, '所有源头全缺 → 必须 warn 一次（打包事故不能静默）')
     assert.match(warns[0], /缺少内置技能/)
   } finally {
     clean(pluginSkills)
@@ -155,7 +155,9 @@ test('内置技能源头缺失时逐个记 missing 并 warn（打包守卫的运
       assert.deepEqual(synced.map((r) => r.action), BUILTIN_SKILLS.map(() => 'missing'))
     })
     assert.equal(warns.length, 1)
-    assert.ok(warns[0].includes('memory-consolidate'), 'warn 必须点名缺了哪些技能')
+    for (const name of BUILTIN_SKILLS) {
+      assert.ok(warns[0].includes(name), `warn 必须点名缺少的技能 ${name}`)
+    }
     assert.deepEqual(readdirSync(skills), [], 'missing 不得写入任何东西')
   } finally {
     clean(emptySource)
