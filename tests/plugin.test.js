@@ -1232,7 +1232,7 @@ test('issue #58：coiEnabled=false 时 apply() 仍然同步内置技能', () => 
       installed.includes('memory-consolidate'),
       `coiEnabled=false 也必须同步内置技能（旧实现下一个都不会有），实际：${JSON.stringify(installed)}`,
     )
-    assert.equal(installed.length, 5, '五个内置技能都应落盘')
+    assert.equal(installed.length, 8, '八个内置技能都应落盘')
   } finally {
     clean(dir)
   }

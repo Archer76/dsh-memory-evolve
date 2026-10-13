@@ -8,6 +8,10 @@
 
 ---
 
+## Additions in this fork
+
+This is a GitHub fork of [csyangwen/dsh-memory-evolve](https://github.com/csyangwen/dsh-memory-evolve). It retains the upstream package identity and latest fixes while integrating three memory operations skills, 14 helper scripts, and two regression test suites from [Archer76/dsh-memory-evolve-suite](https://github.com/Archer76/dsh-memory-evolve-suite). The upstream `memory-consolidate` skill is retained, bringing the built-in total to eight. See the [integration notes](docs/suite-integration.md) for sources, merge decisions, tool usage, and compatibility limits.
+
 ## Quick Start (Installation)
 
 The plugin ships its own `cordis.patch.yml` (declared via `dsh.bundle.patch`), so after `dsh plugin add` the **host side registers automatically — no manual configuration needed**. Using the web profile as an example, two steps:
@@ -15,7 +19,7 @@ The plugin ships its own `cordis.patch.yml` (declared via `dsh.bundle.patch`), s
 ```sh
 # 1. Install into the profile (use link: for a local directory; git/registry
 #    package addresses also work)
-dsh plugin --profile web add github:csyangwen/dsh-memory-evolve
+dsh plugin --profile web add github:Archer76/dsh-memory-evolve
 
 # 2. Restart dsh web — done
 ```

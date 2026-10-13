@@ -1,0 +1,2 @@
+# Keep distributed skill frontmatter and bodies consistent across checkouts.
+skills/**/SKILL.md text eol=lf

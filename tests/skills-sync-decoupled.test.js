@@ -135,10 +135,10 @@ test('每次启动都汇报同步结果（含"全部 unchanged"这种最常见�
   try {
     const first = captureConsole(() => syncBuiltinSkillsIfEnabled({ skillDir: dir }, PLUGIN_SKILLS_DIR))
     assert.equal(first.logs.length, 1)
-    assert.match(first.logs[0], /更新 5 个/)
+    assert.match(first.logs[0], new RegExp(`更新 ${BUILTIN_SKILLS.length} 个`))
     const second = captureConsole(() => syncBuiltinSkillsIfEnabled({ skillDir: dir }, PLUGIN_SKILLS_DIR))
     assert.equal(second.logs.length, 1, '没有变更也要 log——这正是"技能到底装没装"最需要的一行')
-    assert.match(second.logs[0], /共 5 个，更新 0 个/)
+    assert.match(second.logs[0], new RegExp(`共 ${BUILTIN_SKILLS.length} 个，更新 0 个`))
     assert.equal(second.warns.length, 0)
   } finally {
     clean(dir)

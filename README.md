@@ -8,13 +8,17 @@
 
 ---
 
+## 本 fork 的新增内容
+
+本仓库是 [csyangwen/dsh-memory-evolve](https://github.com/csyangwen/dsh-memory-evolve) 的 GitHub fork，保留上游 `dsh-memory-evolve` 包身份和最新修复，并合入 [Archer76/dsh-memory-evolve-suite](https://github.com/Archer76/dsh-memory-evolve-suite) 的三份记忆运维技能、14 个辅助脚本及两组回归测试。保留上游 `memory-consolidate`，内置技能共 8 份。来源、合并取舍、脚本用法及兼容性范围见 [合并说明](docs/suite-integration.md)。
+
 ## 快速开始（安装）
 
 插件包内自带 `cordis.patch.yml`（`dsh.bundle.patch` 声明），`dsh plugin add` 安装后 **host 端自动注册，无需任何手动配置**。以 web profile 为例，两步装好：
 
 ```sh
 # 1. 安装到 profile（本地目录用 link:，也可用 git/registry 包地址）
-dsh plugin --profile web add github:csyangwen/dsh-memory-evolve
+dsh plugin --profile web add github:Archer76/dsh-memory-evolve
 
 # 2. 重启 dsh web 即生效
 ```
